@@ -1,22 +1,42 @@
 rm(list=ls())
-setwd("/home/clinux01/Escritorio/CamiLabo/Practica_4/datos-20231031T140954Z-001/datos/air.mon.mean.nc")   
+getwd()
+setwd("C:/Users/camil/OneDrive/Escritorio/Cami_Labo/Practica_4")   
+
 ############################### Ejercicio ##############################
-library(metR)  #en la compu de la facu no me dejo
+library(metR)  
 require(ncdf4)
+library(lubridate)
+library(ggplot2)
 #Calcular el promedio de temperatura anual (promedio de los 12 meses del
 #año) y graficar la serie resultante con lineas y puntos. Además agregar la
 #linea de tendencia lineal.
-archivo<-"/home/clinux01/Escritorio/CamiLabo/Practica_4/datos-20231031T140954Z-001/datos/air.mon.mean.nc"
-nc<-nc_open(archivo)
-nc
+#Quedemosnos unicamente con el punto mas cercano a la estacion OCBA
+# (-34,-58)
+archivo <- "C:/Users/camil/OneDrive/Escritorio/Cami_Labo/Practica_4/datos-20231031T140954Z-001/datos/air.mon.mean.nc" #donde esta el archivo
+datos_OCBA<- ReadNetCDF(archivo, vars = "air",
+                        subset = list(lat =-34,
+                                    lon = 360-58))
+class (datos_OCBA_periodo) #data.frame
 
-temp_aire<- ncvar_get(nc, "air")
-latitudes<- ncvar_get(nc, "lat") #prestar atencion en como esta escrito en el archivo 
-longitudes<- ncvar_get(nc, "lon")
-tiempos<- ncvar_get(nc, "time")
-head(tiempos) #veo los primeros datos de tiempo para ver com ol estan "configurados"// o son  muy representativos de la fecha
-#ver unidades de tiempo<- en este caso es horas
-tiempos_legibles<- as.Date(tiempos/24,origin="1800-01-01") #como está en horas lo divido por 24
-head(tiempos_legibles) 
-tail (tiempos_legibles) #miro los ultimos
+# Me quedo con el periodo 1990-2010
+datos_OCBA_periodo<- datos_OCBA[which(year(datos_OCBA$time) %in% 1990:2010),]
+attach(datos_OCBA_periodo)
+head(datos_OCBA_periodo)
+tail(datos_OCBA_periodo)
+#Ahora hago el promedio anual para cada año son 20 años deberia tener un dato por año 
 
+anios<-1990:2010
+promedio<-c()
+datos_anio<-c()
+for(anio in anios){
+  datos_anio<-mean(datos_OCBA_periodo$air[which(year(datos_OCBA_periodo$time)==anio)], na.rm=T)
+  promedio<-c(promedio,datos_anio)
+}
+promedio_df<-data.frame(anios,promedio)
+colnames(promedio_df)<-c("Anio","Tempmediaanual")
+attach(promedio_df)
+#Grafico el promedio_df
+grafico<-ggplot(data=promedio_df, mapping=aes(x=Anio, y=Tempmediaanual))
+grafico<-grafico +geom_smooth(method = "lm", se = FALSE,aes(color = "deeppink"))
+grafico<-grafico + scale_color_manual(values = c("deeppink"))
+grafico<-grafico + geom_line(color= "pink") + geom_point(color="pink4")

@@ -43,8 +43,35 @@ dim(datos)  #calculo las dimensiones
 
 datos_region<- ReadNetCDF(archivo, vars = "air",
                           subset = list(lat = c(-65, -20),
-                                        lon = c(280, 310)))  #especifico los dats que quiero leer 
-#Ejercicio 
-archivo <- ("/home/clinux01/Escritorio/Cami_Labo/Practica_4/datos-20231031T140954Z-001/datos/datos_u850.nc") #donde esta el archivo
-nc<- nc_open(archivo) #abro el archivo netCDF
+                                            lon = c(280, 310)))  #especifico los dats que quiero leer 
+#Ejercicio en clase
+library(lubridate)
+archivo <- ("C:/Users/camil/OneDrive/Escritorio/Cami_Labo/Practica_4/datos-20231031T140954Z-001/datos/datos_u850.nc") #donde esta el archivo
+nc<-nc_open(archivo) #abro el archivo netCDF
 nc
+
+#Me quedo con las variables
+comp_u_850<- ncvar_get(nc, "ua850") #extraer la variable
+latitudes<- ncvar_get(nc, "lat")
+longitudes<- ncvar_get(nc, "lon")
+tiempos<- ncvar_get(nc, "time")
+tiempos_legibles<- as.Date(tiempos,origin="1949-12-01 00:00:00")
+#va del 2005 al 2010
+head(tiempos_legibles) #miro los primeros tiempos
+tail (tiempos_legibles) #miro los ultimos tiempos
+
+#selecciono donde esta la cuenca del plata  (38.75S-23.75S; 64.25O-51.25O)
+long_cuenca<-which(longitudes %in% -64.25:-52.25 )
+lat_cuenca<-which(latitudes %in% -38.75:-23.75)
+
+anios<-2005:2010
+datas<-array(data=NA,dim=c(13,16,6))
+i<-1
+for(anio in anios){
+  viento<-comp_u_850[long_cuenca,lat_cuenca,which(year(tiempos_legibles)==anio)]
+  promedio<-apply(viento,c(1,2), mean)
+  datas[,,i]<-(promedio)
+    i<-i+1
+}
+prom_anual<-apply(datas,c(3),mean)
+promedio_df<-data.frame(prom_anual)
