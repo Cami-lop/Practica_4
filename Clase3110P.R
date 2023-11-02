@@ -46,7 +46,8 @@ datos_region<- ReadNetCDF(archivo, vars = "air",
                                             lon = c(280, 310)))  #especifico los dats que quiero leer 
 #Ejercicio en clase
 library(lubridate)
-archivo <- ("C:/Users/camil/OneDrive/Escritorio/Cami_Labo/Practica_4/datos-20231031T140954Z-001/datos/datos_u850.nc") #donde esta el archivo
+#archivo <- ("C:/Users/camil/OneDrive/Escritorio/Cami_Labo/Practica_4/datos-20231031T140954Z-001/datos/datos_u850.nc") #donde esta el archivo
+archivo<-"/home/clinux01/Escritorio/CamiLabo/Practica_4/datos-20231031T140954Z-001/datos/datos_u850.nc"
 nc<-nc_open(archivo) #abro el archivo netCDF
 nc
 
@@ -68,9 +69,8 @@ anios<-2005:2010
 datas<-array(data=NA,dim=c(13,16,6))
 i<-1
 for(anio in anios){
-  viento<-comp_u_850[long_cuenca,lat_cuenca,which(year(tiempos_legibles)==anio)]
-  promedio<-apply(viento,c(1,2), mean)
-  datas[,,i]<-(promedio)
+  viento<-mean(comp_u_850[long_cuenca,lat_cuenca,which(year(tiempos_legibles)==anio)])
+  datas[,,i]<-(viento)
     i<-i+1
 }
 prom_anual<-apply(datas,c(3),mean)

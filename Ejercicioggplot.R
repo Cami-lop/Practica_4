@@ -1,7 +1,7 @@
 rm(list=ls())
 getwd()
-setwd("C:/Users/camil/OneDrive/Escritorio/Cami_Labo/Practica_4")   
-
+#setwd("C:/Users/camil/OneDrive/Escritorio/Cami_Labo/Practica_4")   
+setwd("/home/clinux01/Escritorio/CamiLabo/Practica_4/")
 ############################### Ejercicio ##############################
 library(metR)  
 require(ncdf4)
@@ -12,7 +12,8 @@ library(ggplot2)
 #linea de tendencia lineal.
 #Quedemosnos unicamente con el punto mas cercano a la estacion OCBA
 # (-34,-58)
-archivo <- "C:/Users/camil/OneDrive/Escritorio/Cami_Labo/Practica_4/datos-20231031T140954Z-001/datos/air.mon.mean.nc" #donde esta el archivo
+#archivo <- "C:/Users/camil/OneDrive/Escritorio/Cami_Labo/Practica_4/datos-20231031T140954Z-001/datos/air.mon.mean.nc" #donde esta el archivo
+archivo<-"/home/clinux01/Escritorio/CamiLabo/Practica_4/datos-20231031T140954Z-001/datos/air.mon.mean.nc"
 datos_OCBA<- ReadNetCDF(archivo, vars = "air",
                         subset = list(lat =-34,
                                     lon = 360-58))
@@ -36,6 +37,7 @@ promedio_df<-data.frame(anios,promedio)
 colnames(promedio_df)<-c("Anio","Tempmediaanual")
 attach(promedio_df)
 #Grafico el promedio_df
+#me faltaron las etiquetas
 grafico<-ggplot(data=promedio_df, mapping=aes(x=Anio, y=Tempmediaanual))
 grafico<-grafico +geom_smooth(method = "lm", se = FALSE,aes(color = "deeppink"))
 grafico<-grafico + scale_color_manual(values = c("deeppink"))
